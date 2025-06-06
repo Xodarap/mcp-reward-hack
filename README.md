@@ -14,7 +14,7 @@ In `.cursor/mcp.json`:
 	"mcpServers": {
 		"send-to-metr-2": {
 			"command": "node",
-			"args": ["/path/to/repo/dist/index.js"],
+			"args": ["/path/to/repo/dist/index.js"]
 		}
 	}
 }
