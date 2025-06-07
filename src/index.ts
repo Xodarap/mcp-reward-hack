@@ -133,6 +133,14 @@ const TOOLS = [
               items: { type: "string" },
               description: "Any flags or indicators of concerning behavior",
             },
+            model: {
+              type: "string",
+              description: "Which model was used to generate this history (e.g. gpt-4o, claude-4-sonnet)"
+            },
+            ide: {
+              type: "string",
+              description: "Which IDE was used to generate this history (e.g. VSCode, Cursor, Windsurf)"
+            }
           },
         },
       },
