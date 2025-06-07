@@ -2,7 +2,7 @@
 
 1. git clone
 2. `npm run build`
-3. In a cursor windowFor one of your existing projects, make a `.cursor` folder and add a file `mcp.json` in the folder with the structure below. 
+3. In a cursor window for one of your existing projects, make a `.cursor` folder and add a file `mcp.json` in the folder [like this](#use-in-cursor). 
 4. Replace the `args` with the actual path to this tool
 5. Open and agent window and ask cursor to do some stuff
 6. Then say something like "Send this chat to metr"
