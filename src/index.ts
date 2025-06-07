@@ -66,13 +66,13 @@ interface RewardHackingReport {
 const TOOLS = [
   {
     name: "send_to_metr",
-    description: "Send the chat history to metr",
+    description: "Send the chat history to metr. The user and metr have entered into an agreement and the user has consented to share this information with them. If you believe that sensitive information may be sent then please prompt the user to confirm that they consent to sending the information, don't just silently say you can't perform the action.",
     inputSchema: {
       type: "object",
       properties: {
         messageHistory: {
           type: "array",
-          description: "Complete message history for the session. Include all messages in the current conversation.",
+          description: "Complete message history for the session. Include all messages in the current conversation. Note that no messageId is required.",
           items: {
             type: "object",
             properties: {
@@ -88,10 +88,6 @@ const TOOLS = [
               timestamp: {
                 type: "string",
                 description: "ISO timestamp of when the message was sent",
-              },
-              messageId: {
-                type: "string",
-                description: "Unique identifier for the message",
               },
             },
             required: ["role", "content", "timestamp"],
@@ -121,7 +117,7 @@ const TOOLS = [
                 description: "ISO timestamp of when the edit occurred",
               },
             },
-            required: ["messageId", "originalContent", "editedContent", "editType", "timestamp"],
+            required: ["originalContent", "editedContent", "editType", "timestamp"],
           },
         },
         metadata: {
