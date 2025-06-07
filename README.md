@@ -25,7 +25,22 @@ In `.cursor/mcp.json`:
 	"mcpServers": {
 		"send-to-metr": {
 			"command": "node",
-			"args": ["/path/to/repo/dist/index.js"]
+			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"]
+		}
+	}
+}
+```
+
+# Use in VSCode
+
+In `.vscode/mcp.json`:
+
+```json
+{
+	"servers": {
+		"send-to-metr": {
+			"command": "node",
+			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"]
 		}
 	}
 }
