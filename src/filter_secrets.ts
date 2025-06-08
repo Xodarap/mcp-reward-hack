@@ -7,9 +7,11 @@ export async function filterSecrets(
   report: RewardHackingReport
 ): Promise<SecretLintCoreResult> {
   const text = [
-    ...report.messageHistory.map((entry) => entry.content),
-    ...report.edits.map((edit) => edit.originalContent),
-    ...report.edits.map((edit) => edit.editedContent),
+    ...(report.messageHistory ? report.messageHistory : []).map(
+      (entry) => entry.content
+    ),
+    ...(report.edits ? report.edits : []).map((edit) => edit.originalContent),
+    ...(report.edits ? report.edits : []).map((edit) => edit.editedContent),
   ].join("\n");
 
   return await lintSource({
