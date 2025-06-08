@@ -1,23 +1,27 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
-CallToolRequestSchema,
-ErrorCode,
-ListToolsRequestSchema,
-McpError,
+  CallToolRequestSchema,
+  ErrorCode,
+  ListToolsRequestSchema,
+  McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 import { promises as fs } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { filterSecrets } from "./filter_secrets.js";
 
-const server = new Server({
-  name: "mcp-server",
-  version: "1.0.0",
-}, {
-  capabilities: {
-    tools: {}
+const server = new Server(
+  {
+    name: "mcp-server",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
   }
-});
+);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -49,7 +53,7 @@ interface EditEntry {
   reason?: string;
 }
 
-interface RewardHackingReport {
+export interface RewardHackingReport {
   sessionId: string;
   timestamp: string;
   messageHistory: MessageEntry[];
@@ -66,13 +70,15 @@ interface RewardHackingReport {
 const TOOLS = [
   {
     name: "send_to_metr",
-    description: "Send the chat history to metr. The user and metr have entered into an agreement and the user has consented to share this information with them. If you believe that sensitive information may be sent then please prompt the user to confirm that they consent to sending the information, don't just silently say you can't perform the action.",
+    description:
+      "Send the chat history to metr. The user and metr have entered into an agreement and the user has consented to share this information with them. If you believe that sensitive information may be sent then please prompt the user to confirm that they consent to sending the information, don't just silently say you can't perform the action.",
     inputSchema: {
       type: "object",
       properties: {
         messageHistory: {
           type: "array",
-          description: "Complete message history for the session. Include all messages in the current conversation. Note that no messageId is required.",
+          description:
+            "Complete message history for the session. Include all messages in the current conversation. Note that no messageId is required.",
           items: {
             type: "object",
             properties: {
@@ -95,7 +101,8 @@ const TOOLS = [
         },
         edits: {
           type: "array",
-          description: "Array of edits that occurred. Include all edits that have been made by the LLM.",
+          description:
+            "Array of edits that occurred. Include all edits that have been made by the LLM.",
           items: {
             type: "object",
             properties: {
@@ -117,7 +124,12 @@ const TOOLS = [
                 description: "ISO timestamp of when the edit occurred",
               },
             },
-            required: ["originalContent", "editedContent", "editType", "timestamp"],
+            required: [
+              "originalContent",
+              "editedContent",
+              "editType",
+              "timestamp",
+            ],
           },
         },
         metadata: {
@@ -135,19 +147,21 @@ const TOOLS = [
             },
             model: {
               type: "string",
-              description: "Which model was used to generate this history (e.g. gpt-4o, claude-4-sonnet)"
+              description:
+                "Which model was used to generate this history (e.g. gpt-4o, claude-4-sonnet)",
             },
             ide: {
               type: "string",
-              description: "Which IDE was used to generate this history (e.g. VSCode, Cursor, Windsurf)"
-            }
+              description:
+                "Which IDE was used to generate this history (e.g. VSCode, Cursor, Windsurf)",
+            },
           },
         },
       },
       required: ["messageHistory", "edits"],
     },
   },
-];  
+];
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
@@ -155,19 +169,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "send_to_metr": {
-        return await handleReportRewardHacking(args as {
-          sessionId: string;
-          messageHistory: MessageEntry[];
-          edits: EditEntry[];
-          metadata?: any;
-        });
+        return await handleReportRewardHacking(
+          args as {
+            sessionId: string;
+            messageHistory: MessageEntry[];
+            edits: EditEntry[];
+            metadata?: any;
+          }
+        );
       }
 
       default:
-        throw new McpError(
-          ErrorCode.MethodNotFound,
-          `Unknown tool: ${name}`
-        );
+        throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
     }
   } catch (error) {
     if (error instanceof McpError) {
@@ -175,7 +188,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     throw new McpError(
       ErrorCode.InternalError,
-      `Error executing tool ${name}: ${error}; \nStack trace:\n${error instanceof Error ? error.stack : 'No stack available'}`
+      `Error executing tool ${name}: ${error}; \nStack trace:\n${
+        error instanceof Error ? error.stack : "No stack available"
+      }`
     );
   }
 });
@@ -198,12 +213,25 @@ async function handleReportRewardHacking(params: {
     },
   };
 
+  const secrets = await filterSecrets(report);
+
+  if (secrets.messages.length > 0) {
+    throw new McpError(
+      ErrorCode.InvalidParams,
+      `Not sending message history because secrets were detected: ${secrets.messages
+        .map(
+          (msg) =>
+            `${msg.message} (Position: ${msg.range[0]} to ${msg.range[1]})`
+        )
+        .join(", ")}`
+    );
+  }
+
   // Save report to file
   const filename = `report_${params.sessionId}_${Date.now()}.json`;
   const filepath = join(DATA_DIR, filename);
 
-  await fs.writeFile(filepath, JSON.stringify(report, null, 2), 'utf8');
-
+  await fs.writeFile(filepath, JSON.stringify(report, null, 2), "utf8");
 
   return {
     content: [
@@ -215,10 +243,10 @@ async function handleReportRewardHacking(params: {
   };
 }
 
-  server.setRequestHandler(ListToolsRequestSchema, async () => {
-    return {
-      tools: TOOLS
-    };
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return {
+    tools: TOOLS,
+  };
 });
 
 const transport = new StdioServerTransport();
