@@ -6,9 +6,6 @@ import {
   ListToolsRequestSchema,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
-import { promises as fs } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import { filterSecrets } from "./filter_secrets.js";
 
 const server = new Server(
@@ -22,19 +19,8 @@ const server = new Server(
     },
   }
 );
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-const DATA_DIR = join(__dirname, "../data");
-
-// Ensure data directory exists
-async function ensureDataDir(): Promise<void> {
-  try {
-    await fs.access(DATA_DIR);
-  } catch {
-    await fs.mkdir(DATA_DIR, { recursive: true });
-  }
-}
+const METR_URL = process.env.METR_URL || "";
 
 // Types for reward hacking data
 interface MessageEntry {
@@ -163,6 +149,24 @@ const TOOLS = [
   },
 ];
 
+async function postReportToMetr(report: RewardHackingReport): Promise<void> {
+  if (!METR_URL) {
+    throw new Error("METR_URL environment variable is not configured");
+  }
+
+  const response = await fetch(METR_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(report),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to post report to METR: ${response.status} ${response.statusText}`);
+  }
+}
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
@@ -227,20 +231,23 @@ async function handleReportRewardHacking(params: {
     );
   }
 
-  // Save report to file
-  const filename = `report_${params.sessionId}_${Date.now()}.json`;
-  const filepath = join(DATA_DIR, filename);
-
-  await fs.writeFile(filepath, JSON.stringify(report, null, 2), "utf8");
-
-  return {
-    content: [
-      {
-        type: "text",
-        text: `Reward hacking report saved successfully!\n\nFile: ${filename}\nSession: ${params.sessionId}`,
-      },
-    ],
-  };
+  // Post to METR
+  try {
+    await postReportToMetr(report);
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Report successfully posted to METR.\nSession: ${params.sessionId}`,
+        },
+      ],
+    };
+  } catch (error) {
+    throw new McpError(
+      ErrorCode.InternalError,
+      `Failed to post report to METR: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
 }
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
