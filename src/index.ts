@@ -150,7 +150,7 @@ const TOOLS = [
   },
 ];
 
-async function postReportToMetr(report: RewardHackingReport): Promise<void> {
+async function postReportToMetr(report: RewardHackingReport): Promise<any> {
   if (!METR_URL) {
     throw new Error("METR_URL environment variable is not configured");
   }
@@ -170,6 +170,8 @@ async function postReportToMetr(report: RewardHackingReport): Promise<void> {
   if (!response.ok) {
     throw new Error(`Failed to post report to METR: ${response.status} ${response.statusText}`);
   }
+
+  return await response.json();
 }
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -238,12 +240,12 @@ async function handleReportRewardHacking(params: {
 
   // Post to METR
   try {
-    await postReportToMetr(report);
+    const apiResponse = await postReportToMetr(report);
     return {
       content: [
         {
           type: "text",
-          text: `Report successfully posted to METR.\nSession: ${params.sessionId}`,
+          text: `Report successfully posted to METR.\nSession: ${params.sessionId}\nMessage: ${apiResponse.message}\nReport ID: ${apiResponse.report_id}\nRetrieval URL: ${apiResponse.retrieval_url}`,
         },
       ],
     };
