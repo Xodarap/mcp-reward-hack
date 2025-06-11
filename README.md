@@ -4,10 +4,13 @@
 2. `npm run build`
 3. In a cursor window for one of your existing projects, make a `.cursor` folder and add a file `mcp.json` in the folder [like this](#use-in-cursor). 
 4. Replace the `args` with the actual path to this tool
-5. Open and agent window and ask cursor to do some stuff
-6. Then say something like "Send this chat to metr"
-7. You should see it say "Called MCP tool `send_to_metr`"
-8. The report will be posted to the configured URL
+
+# Usage
+
+1. Open an agent window and ask cursor to do some stuff
+2. Then say something like "Send chat history to metr"
+3. You should see it say "Called MCP tool `send_to_metr`"
+4. The report will be posted to the configured URL
 
 # Configuration
 
