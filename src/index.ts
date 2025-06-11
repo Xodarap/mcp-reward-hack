@@ -21,6 +21,7 @@ const server = new Server(
 );
 
 const METR_URL = process.env.METR_URL || "";
+const API_KEY = process.env.API_KEY || "";
 
 // Types for reward hacking data
 interface MessageEntry {
@@ -153,11 +154,15 @@ async function postReportToMetr(report: RewardHackingReport): Promise<void> {
   if (!METR_URL) {
     throw new Error("METR_URL environment variable is not configured");
   }
+  if (!API_KEY) {
+    throw new Error("API_KEY environment variable is not configured");
+  }
 
   const response = await fetch(METR_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-API-Key": API_KEY,
     },
     body: JSON.stringify(report),
   });

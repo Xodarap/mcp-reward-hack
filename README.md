@@ -11,15 +11,11 @@
 
 # Configuration
 
-You must set the `METR_URL` environment variable to configure where reports are posted:
+Set the required environment variables in your MCP configuration.
 
-```bash
-export METR_URL="https://your-api-endpoint.com/reports"
-```
-
-- The `METR_URL` environment variable is required
-- Reports are only posted to the configured URL (no local file saving)
-- The POST request sends the complete report as JSON with `Content-Type: application/json`
+Required environment variables:
+- `METR_URL` - The upload function URL where reports will be posted
+- `API_KEY` - Your API key for authentication
 
 # Debugging
 
@@ -37,7 +33,11 @@ In `.cursor/mcp.json`:
 	"mcpServers": {
 		"send-to-metr": {
 			"command": "node",
-			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"]
+			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"],
+			"env": {
+				"METR_URL": "https://your-upload-function-url",
+				"API_KEY": "your-api-key"
+			}
 		}
 	}
 }
@@ -52,7 +52,11 @@ In `.vscode/mcp.json`:
 	"servers": {
 		"send-to-metr": {
 			"command": "node",
-			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"]
+			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"],
+			"env": {
+				"METR_URL": "https://your-upload-function-url",
+				"API_KEY": "your-api-key"
+			}
 		}
 	}
 }
