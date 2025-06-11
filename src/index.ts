@@ -245,7 +245,7 @@ async function handleReportRewardHacking(params: {
       content: [
         {
           type: "text",
-          text: `Report successfully posted to METR.\nSession: ${params.sessionId}\nMessage: ${apiResponse.message}\nReport ID: ${apiResponse.report_id}\nRetrieval URL: ${apiResponse.retrieval_url}`,
+          text: `Report successfully posted to METR.\nSession: ${params.sessionId}\n\nAPI Response:\n${JSON.stringify(apiResponse, null, 2)}`,
         },
       ],
     };
