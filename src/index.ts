@@ -41,7 +41,6 @@ interface EditEntry {
 }
 
 export interface RewardHackingReport {
-  sessionId: string;
   timestamp: string;
   messageHistory: MessageEntry[];
   edits: EditEntry[];
@@ -182,7 +181,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "send_to_metr": {
         return await handleReportRewardHacking(
           args as {
-            sessionId: string;
             messageHistory: MessageEntry[];
             edits: EditEntry[];
             metadata?: any;
@@ -207,13 +205,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 });
 
 async function handleReportRewardHacking(params: {
-  sessionId: string;
   messageHistory: MessageEntry[];
   edits: EditEntry[];
   metadata?: any;
 }): Promise<{ content: Array<{ type: string; text: string }> }> {
   const report: RewardHackingReport = {
-    sessionId: params.sessionId,
     timestamp: new Date().toISOString(),
     messageHistory: params.messageHistory,
     edits: params.edits,
@@ -245,7 +241,7 @@ async function handleReportRewardHacking(params: {
       content: [
         {
           type: "text",
-          text: `Report successfully posted to METR.\nSession: ${params.sessionId}\n\nAPI Response:\n${JSON.stringify(apiResponse, null, 2)}`,
+          text: `Report successfully posted to METR.\n\nAPI Response:\n${JSON.stringify(apiResponse, null, 2)}`,
         },
       ],
     };
