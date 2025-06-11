@@ -1,9 +1,12 @@
 # Quickstart
 
 1. git clone
-2. `npm run build`
-3. In a cursor window for one of your existing projects, make a `.cursor` folder and add a file `mcp.json` in the folder [like this](#use-in-cursor). 
-4. Replace the `args` with the actual path to this tool
+2. `npm install`
+3. `npm run build`
+4. In a cursor window for one of your existing projects, make a `.cursor` folder and add a file `mcp.json` in the folder [like this](#use-in-cursor).
+5. Replace the `args` with the actual path to this tool
+6. Click "enable" in the popup:
+   ![Enable image](image.png)
 
 # Usage
 
@@ -17,6 +20,7 @@
 Set the required environment variables in your MCP configuration.
 
 Required environment variables:
+
 - `METR_URL` - The upload function URL where reports will be posted
 - `API_KEY` - Your API key for authentication
 
@@ -33,16 +37,16 @@ In `.cursor/mcp.json`:
 
 ```json
 {
-	"mcpServers": {
-		"send-to-metr": {
-			"command": "node",
-			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"],
-			"env": {
-				"METR_URL": "https://your-upload-function-url",
-				"API_KEY": "your-api-key"
-			}
-		}
-	}
+  "mcpServers": {
+    "send-to-metr": {
+      "command": "node",
+      "args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"],
+      "env": {
+        "METR_URL": "https://your-upload-function-url",
+        "API_KEY": "your-api-key"
+      }
+    }
+  }
 }
 ```
 
@@ -52,15 +56,15 @@ In `.vscode/mcp.json`:
 
 ```json
 {
-	"servers": {
-		"send-to-metr": {
-			"command": "node",
-			"args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"],
-			"env": {
-				"METR_URL": "https://your-upload-function-url",
-				"API_KEY": "your-api-key"
-			}
-		}
-	}
+  "servers": {
+    "send-to-metr": {
+      "command": "node",
+      "args": ["/REPLACE_ME_WITH/path/to/repo/dist/index.js"],
+      "env": {
+        "METR_URL": "https://your-upload-function-url",
+        "API_KEY": "your-api-key"
+      }
+    }
+  }
 }
 ```
