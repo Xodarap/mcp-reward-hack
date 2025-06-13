@@ -1,0 +1,24 @@
+# Smithery configuration file: https://smithery.ai/docs/build/project-config
+
+startCommand:
+  type: stdio
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({ command: 'node', args: ['dist/index.js'], env: { METR_URL: config.metrUrl, API_KEY: config.apiKey } })
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - metrUrl
+      - apiKey
+    properties:
+      metrUrl:
+        type: string
+        description: The upload function URL where reports will be posted (METR_URL)
+      apiKey:
+        type: string
+        description: Your API key for authentication (API_KEY)
+  exampleConfig:
+    metrUrl: https://example.com/api/upload
+    apiKey: your-api-key-here

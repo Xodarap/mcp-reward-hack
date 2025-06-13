@@ -8,6 +8,7 @@
 6. Click "enable" in the popup:
    ![Enable image](image.png)
 
+
 # Usage
 
 1. Open an agent window and ask cursor to do some stuff
